@@ -59,8 +59,7 @@ export function CareersPage() {
           Build AI products that matter, with teams that care about quality.
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-dsua-700 md:text-base">
-          Explore high-impact roles in Data Science, Engineering, and Delivery. We designed this experience for faster discovery:
-          clear filters, stronger vacancy structure, and smoother apply flow.
+          Explore high-impact roles in Data Science, Engineering, and Delivery.
         </p>
 
         <div className="mt-8 grid gap-3 text-sm font-semibold text-dsua-800 md:flex md:items-center md:gap-6">

@@ -29,7 +29,6 @@ export function JobCard({ job }: JobCardProps) {
       </div>
 
       <div className="mt-6 flex items-center justify-between">
-        <p className="text-sm font-semibold text-dsua-700">{job.salary}</p>
         <Link
           to={`/vacancy/${job.slug}`}
           className="rounded-full bg-dsua-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-600"
