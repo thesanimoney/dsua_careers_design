@@ -1,0 +1,145 @@
+import { useState, type DragEvent, type ReactNode } from 'react';
+import { Modal } from './Modal';
+
+interface SubmitApplicationModalProps {
+  open: boolean;
+  jobTitle: string;
+  onClose: () => void;
+}
+
+export function SubmitApplicationModal({ open, jobTitle, onClose }: SubmitApplicationModalProps) {
+  const [submitted, setSubmitted] = useState(false);
+  const [profileLink, setProfileLink] = useState('');
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  const handleClose = () => {
+    setSubmitted(false);
+    setProfileLink('');
+    setCvFile(null);
+    setIsDraggingFile(false);
+    setSubmitError('');
+    onClose();
+  };
+
+  const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    setIsDraggingFile(false);
+    const file = event.dataTransfer.files?.[0];
+    if (!file) return;
+    setCvFile(file);
+    setSubmitError('');
+  };
+
+  return (
+    <Modal open={open} title="Submit Application" onClose={handleClose}>
+      {submitted ? (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+          Application sent for <strong>{jobTitle}</strong>. Our recruiter will contact you soon.
+        </div>
+      ) : (
+        <form
+          className="space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!cvFile && profileLink.trim().length === 0) {
+              setSubmitError('Add a CV file or provide your LinkedIn/CV link.');
+              return;
+            }
+            setSubmitError('');
+            setSubmitted(true);
+          }}
+        >
+          <Field label="Full name">
+            <input
+              required
+              placeholder="Jane Doe"
+              className="w-full rounded-xl border border-dsua-200 px-3 py-2 text-sm outline-none transition focus:border-accent-500"
+            />
+          </Field>
+          <Field label="Email">
+            <input
+              required
+              type="email"
+              placeholder="jane@example.com"
+              className="w-full rounded-xl border border-dsua-200 px-3 py-2 text-sm outline-none transition focus:border-accent-500"
+            />
+          </Field>
+          <Field label="LinkedIn profile or CV link (optional)">
+            <input
+              value={profileLink}
+              onChange={(event) => setProfileLink(event.target.value)}
+              placeholder="https://..."
+              className="w-full rounded-xl border border-dsua-200 px-3 py-2 text-sm outline-none transition focus:border-accent-500"
+            />
+          </Field>
+
+          <Field label="CV file">
+            <label
+              onDragEnter={() => setIsDraggingFile(true)}
+              onDragOver={(event) => {
+                event.preventDefault();
+                setIsDraggingFile(true);
+              }}
+              onDragLeave={() => setIsDraggingFile(false)}
+              onDrop={handleDrop}
+              className={`block cursor-pointer rounded-xl border-2 border-dashed p-4 text-center transition ${
+                isDraggingFile ? 'border-accent-500 bg-cyan-50' : 'border-dsua-200 bg-dsua-50'
+              }`}
+            >
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                className="sr-only"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null;
+                  setCvFile(file);
+                  setSubmitError('');
+                }}
+              />
+              <p className="text-sm font-semibold text-dsua-800">Drop your CV here or click to upload</p>
+              <p className="mt-1 text-xs text-dsua-600">Accepted: PDF, DOC, DOCX</p>
+              {cvFile && (
+                <p className="mt-2 text-xs font-semibold text-accent-600">
+                  Selected: {cvFile.name}
+                </p>
+              )}
+            </label>
+          </Field>
+
+          <Field label="Message (optional)">
+            <textarea
+              rows={4}
+              placeholder="Tell us briefly about your relevant experience."
+              className="w-full rounded-xl border border-dsua-200 px-3 py-2 text-sm outline-none transition focus:border-accent-500"
+            />
+          </Field>
+          <div className="rounded-xl border border-dsua-100 bg-dsua-50 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-dsua-600">
+            Vacancy: {jobTitle}
+          </div>
+          {submitError && (
+            <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700">
+              {submitError}
+            </div>
+          )}
+          <button
+            type="submit"
+            className="w-full rounded-full bg-dsua-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent-600"
+          >
+            Send Application
+          </button>
+        </form>
+      )}
+    </Modal>
+  );
+}
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-dsua-500">{label}</span>
+      {children}
+    </label>
+  );
+}
